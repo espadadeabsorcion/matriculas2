@@ -1,0 +1,610 @@
+{% extends './plantilla.html' %}
+{% load static %}
+
+{% block contenido %}
+<style>
+    /* Custom styles for the report page */
+    .report-header {
+        background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: 0 4px 20px rgba(94, 114, 228, 0.4);
+    }
+    
+    .report-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .report-header p {
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+    
+    .stats-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+        height: 100%;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    .stats-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 1rem;
+    }
+    
+    .stats-icon.primary { background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%); }
+    .stats-icon.success { background: linear-gradient(135deg, #2dce89 0%, #26a65b 100%); }
+    .stats-icon.warning { background: linear-gradient(135deg, #fb6340 0%, #fbb140 100%); }
+    .stats-icon.info { background: linear-gradient(135deg, #11cdef 0%, #1171ef 100%); }
+    
+    .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #32325d;
+        line-height: 1;
+    }
+    
+    .stats-label {
+        font-size: 0.875rem;
+        color: #8898aa;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 0.5rem;
+    }
+    
+    .table-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    
+    .table-card-header {
+        background: linear-gradient(135deg, #f8f9fe 0%, #ffffff 100%);
+        padding: 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .table-card-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #32325d;
+        margin: 0;
+    }
+    
+    .export-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .export-btn {
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+    }
+    
+    .export-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .export-btn.copy { background: #5e72e4; color: white; }
+    .export-btn.excel { background: #2dce89; color: white; }
+    .export-btn.csv { background: #11cdef; color: white; }
+    .export-btn.pdf { background: #f5365c; color: white; }
+    
+    .table-card-body {
+        padding: 0;
+    }
+    
+    #tbl_reporte {
+        margin-bottom: 0 !important;
+    }
+    
+    #tbl_reporte thead th {
+        background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+        color: white;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 1rem 1.5rem;
+        border: none;
+        white-space: nowrap;
+    }
+    
+    #tbl_reporte tbody td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #e9ecef;
+        color: #525f7f;
+        font-size: 0.9rem;
+    }
+    
+    #tbl_reporte tbody tr:hover {
+        background-color: #f8f9fe;
+    }
+    
+    #tbl_reporte tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .availability-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+    
+    .availability-badge.high {
+        background: rgba(45, 206, 137, 0.15);
+        color: #2dce89;
+    }
+    
+    .availability-badge.medium {
+        background: rgba(251, 99, 64, 0.15);
+        color: #fb6340;
+    }
+    
+    .availability-badge.low {
+        background: rgba(245, 54, 92, 0.15);
+        color: #f5365c;
+    }
+    
+    .progress-mini {
+        height: 6px;
+        border-radius: 3px;
+        background: #e9ecef;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+    
+    .progress-mini-bar {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+    
+    .btn-back {
+        background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        border: none;
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(94, 114, 228, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* DataTables customization */
+    .dataTables_wrapper .dataTables_filter {
+        padding: 1rem 1.5rem;
+    }
+    
+    .dataTables_wrapper .dataTables_filter input {
+        border: 1px solid #e9ecef;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        margin-left: 0.5rem;
+    }
+    
+    .dataTables_wrapper .dataTables_info {
+        padding: 1rem 1.5rem;
+        color: #8898aa;
+        font-size: 0.875rem;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate {
+        padding: 1rem 1.5rem;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        border-radius: 0.5rem !important;
+        margin: 0 0.25rem;
+    }
+    
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: linear-gradient(135deg, #5e72e4 0%, #825ee4 100%) !important;
+        border-color: #5e72e4 !important;
+        color: white !important;
+    }
+    
+    .dataTables_wrapper .dataTables_length {
+        padding: 1rem 1.5rem;
+    }
+    
+    .dataTables_wrapper .dataTables_length select {
+        border: 1px solid #e9ecef;
+        border-radius: 0.5rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    /* Hide default DataTables buttons - we use custom ones */
+    .dt-buttons {
+        display: none !important;
+    }
+    
+    @media (max-width: 768px) {
+        .report-header {
+            padding: 1.5rem;
+        }
+        
+        .report-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .stats-card {
+            margin-bottom: 1rem;
+        }
+        
+        .table-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .export-buttons {
+            width: 100%;
+            justify-content: flex-start;
+        }
+        
+        #tbl_reporte thead th,
+        #tbl_reporte tbody td {
+            padding: 0.75rem 1rem;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4" style="margin-top: 80px;">
+    <!-- Header Section -->
+    <div class="report-header">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1><i class="fa fa-chart-bar me-2"></i> Reporte de Matrículas por Curso</h1>
+                <p>Visualiza el estado de ocupación de todos los cursos disponibles</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <span class="badge bg-white text-primary px-3 py-2" style="font-size: 0.9rem;">
+                    <i class="fa fa-calendar me-1"></i> Actualizado: {% now "d/m/Y H:i" %}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon primary">
+                    <i class="fa fa-book"></i>
+                </div>
+                <div class="stats-value" id="total-cursos">{{ reporte|length }}</div>
+                <div class="stats-label">Total Cursos</div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon success">
+                    <i class="fa fa-users"></i>
+                </div>
+                <div class="stats-value" id="total-matriculados">0</div>
+                <div class="stats-label">Total Matriculados</div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon warning">
+                    <i class="fa fa-chair"></i>
+                </div>
+                <div class="stats-value" id="total-cupos">0</div>
+                <div class="stats-label">Cupos Totales</div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="stats-card">
+                <div class="stats-icon info">
+                    <i class="fa fa-check-circle"></i>
+                </div>
+                <div class="stats-value" id="cupos-disponibles">0</div>
+                <div class="stats-label">Cupos Disponibles</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Card -->
+    <div class="table-card mb-4">
+        <div class="table-card-header">
+            <h3><i class="fa fa-table me-2"></i> Detalle por Curso</h3>
+            <div class="export-buttons">
+                <button class="export-btn copy" id="btn-copy" title="Copiar al portapapeles">
+                    <i class="fa fa-copy"></i> Copiar
+                </button>
+                <button class="export-btn excel" id="btn-excel" title="Exportar a Excel">
+                    <i class="fa fa-file-excel"></i> Excel
+                </button>
+                <button class="export-btn csv" id="btn-csv" title="Exportar a CSV">
+                    <i class="fa fa-file-alt"></i> CSV
+                </button>
+                <button class="export-btn pdf" id="btn-pdf" title="Exportar a PDF">
+                    <i class="fa fa-file-pdf"></i> PDF
+                </button>
+            </div>
+        </div>
+        <div class="table-card-body">
+            <table id="tbl_reporte" class="table table-hover" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th><i class="fa fa-graduation-cap me-1"></i> Nombre del Curso</th>
+                        <th><i class="fa fa-layer-group me-1"></i> Área</th>
+                        <th class="text-center"><i class="fa fa-users me-1"></i> Cupo Máximo</th>
+                        <th class="text-center"><i class="fa fa-user-check me-1"></i> Matriculados</th>
+                        <th class="text-center"><i class="fa fa-door-open me-1"></i> Disponibles</th>
+                        <th class="text-center"><i class="fa fa-chart-pie me-1"></i> Ocupación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in reporte %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.nombre }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark px-2 py-1">{{ item.area }}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="fw-bold">{{ item.cupo_max }}</span>
+                        </td>
+                        <td class="text-center">
+                            <span class="fw-bold text-primary">{{ item.matriculados }}</span>
+                        </td>
+                        <td class="text-center">
+                            {% if item.disponibles > 5 %}
+                            <span class="availability-badge high">
+                                <i class="fa fa-check-circle me-1"></i> {{ item.disponibles }}
+                            </span>
+                            {% elif item.disponibles > 0 %}
+                            <span class="availability-badge medium">
+                                <i class="fa fa-exclamation-circle me-1"></i> {{ item.disponibles }}
+                            </span>
+                            {% else %}
+                            <span class="availability-badge low">
+                                <i class="fa fa-times-circle me-1"></i> {{ item.disponibles }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% widthratio item.matriculados item.cupo_max 100 as ocupacion %}
+                            <div class="d-flex flex-column align-items-center">
+                                <small class="text-muted">{{ ocupacion }}%</small>
+                                <div class="progress-mini" style="width: 80px;">
+                                    {% if ocupacion|add:0 >= 90 %}
+                                    <div class="progress-mini-bar" style="width: {{ ocupacion }}%; background: linear-gradient(135deg, #f5365c 0%, #f56036 100%);"></div>
+                                    {% elif ocupacion|add:0 >= 70 %}
+                                    <div class="progress-mini-bar" style="width: {{ ocupacion }}%; background: linear-gradient(135deg, #fb6340 0%, #fbb140 100%);"></div>
+                                    {% else %}
+                                    <div class="progress-mini-bar" style="width: {{ ocupacion }}%; background: linear-gradient(135deg, #2dce89 0%, #26a65b 100%);"></div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <i class="fa fa-inbox fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No hay datos disponibles</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Back Button -->
+    <div class="d-flex justify-content-between align-items-center">
+        <a class="btn-back" href="{% url 'index' %}">
+            <i class="fa fa-arrow-left"></i> Volver al Inicio
+        </a>
+        <small class="text-muted">
+            <i class="fa fa-info-circle me-1"></i> Los datos se actualizan en tiempo real
+        </small>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Calculate statistics
+        var totalMatriculados = 0;
+        var totalCupos = 0;
+        var cuposDisponibles = 0;
+        
+        {% for item in reporte %}
+        totalMatriculados += {{ item.matriculados }};
+        totalCupos += {{ item.cupo_max }};
+        cuposDisponibles += {{ item.disponibles }};
+        {% endfor %}
+        
+        // Update statistics cards with animation
+        animateValue('total-matriculados', 0, totalMatriculados, 1000);
+        animateValue('total-cupos', 0, totalCupos, 1000);
+        animateValue('cupos-disponibles', 0, cuposDisponibles, 1000);
+        
+        function animateValue(id, start, end, duration) {
+            var obj = document.getElementById(id);
+            var range = end - start;
+            var minTimer = 50;
+            var stepTime = Math.abs(Math.floor(duration / range));
+            stepTime = Math.max(stepTime, minTimer);
+            var startTime = new Date().getTime();
+            var endTime = startTime + duration;
+            var timer;
+            
+            function run() {
+                var now = new Date().getTime();
+                var remaining = Math.max((endTime - now) / duration, 0);
+                var value = Math.round(end - (remaining * range));
+                obj.innerHTML = value;
+                if (value == end) {
+                    clearInterval(timer);
+                }
+            }
+            
+            timer = setInterval(run, stepTime);
+            run();
+        }
+        
+        // Initialize DataTable with export functionality
+        var table = $('#tbl_reporte').DataTable({
+            dom: 'lfrtip',
+            buttons: [
+                { 
+                    extend: 'copyHtml5', 
+                    className: 'btn btn-outline-primary d-none', 
+                    text: '<i class="fa fa-copy"></i>',
+                    title: 'Reporte de Matrículas por Curso',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                },
+                { 
+                    extend: 'excelHtml5', 
+                    className: 'btn btn-outline-success d-none', 
+                    text: '<i class="fa fa-file-excel"></i>',
+                    title: 'Reporte de Matrículas por Curso',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                },
+                { 
+                    extend: 'csvHtml5', 
+                    className: 'btn btn-outline-info d-none', 
+                    text: '<i class="fa fa-file-csv"></i>',
+                    title: 'Reporte de Matrículas por Curso',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4]
+                    }
+                },
+                { 
+                    extend: 'pdfHtml5', 
+                    className: 'btn btn-outline-danger d-none', 
+                    text: '<i class="fa fa-file-pdf"></i>',
+                    title: 'Reporte de Matrículas por Curso',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4]
+                    },
+                    customize: function(doc) {
+                        doc.styles.tableHeader = {
+                            bold: true,
+                            fontSize: 11,
+                            color: 'white',
+                            fillColor: '#5e72e4',
+                            alignment: 'center'
+                        };
+                    }
+                }
+            ],
+            "order": [[ 0, "asc" ]],
+            "language": {
+                "lengthMenu": "Mostrar _MENU_ registros",
+                "zeroRecords": "No se encontraron resultados",
+                "info": "Mostrando _START_ a _END_ de _TOTAL_ registros",
+                "infoEmpty": "Mostrando 0 a 0 de 0 registros",
+                "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                "search": "<i class='fa fa-search'></i> Buscar:",
+                "paginate": {
+                    "first": "<i class='fa fa-angle-double-left'></i>",
+                    "last": "<i class='fa fa-angle-double-right'></i>",
+                    "next": "<i class='fa fa-angle-right'></i>",
+                    "previous": "<i class='fa fa-angle-left'></i>"
+                }
+            },
+            "pageLength": 10,
+            "responsive": true
+        });
+        
+        // Custom button handlers
+        $('#btn-copy').on('click', function() {
+            table.button('.buttons-copy').trigger();
+            showNotification('success', '¡Copiado!', 'Datos copiados al portapapeles');
+        });
+        
+        $('#btn-excel').on('click', function() {
+            table.button('.buttons-excel').trigger();
+            showNotification('success', '¡Exportado!', 'Archivo Excel generado correctamente');
+        });
+        
+        $('#btn-csv').on('click', function() {
+            table.button('.buttons-csv').trigger();
+            showNotification('success', '¡Exportado!', 'Archivo CSV generado correctamente');
+        });
+        
+        $('#btn-pdf').on('click', function() {
+            table.button('.buttons-pdf').trigger();
+            showNotification('success', '¡Exportado!', 'Archivo PDF generado correctamente');
+        });
+        
+        // Notification function
+        function showNotification(type, title, message) {
+            if (typeof Swal !== 'undefined') {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+                
+                Toast.fire({
+                    icon: type,
+                    title: title,
+                    text: message
+                });
+            }
+        }
+    });
+</script>
+{% endblock contenido %}

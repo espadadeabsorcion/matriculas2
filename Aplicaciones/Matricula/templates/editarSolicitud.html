@@ -1,0 +1,507 @@
+{% extends './plantilla.html' %}
+{% load static %}
+
+{% block contenido %}
+<style>
+    /* Custom styles for the edit enrollment form */
+    .form-header {
+        background: linear-gradient(135deg, #fb6340 0%, #fbb140 100%);
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: 0 4px 20px rgba(251, 99, 64, 0.4);
+    }
+    
+    .form-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-header p {
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+    
+    .form-card {
+        background: white;
+        border-radius: 1rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+    }
+    
+    .form-card-header {
+        background: linear-gradient(135deg, #f8f9fe 0%, #ffffff 100%);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .form-card-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #32325d;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .form-card-header h3 i {
+        color: #fb6340;
+    }
+    
+    .form-card-body {
+        padding: 2rem;
+    }
+    
+    .form-group-custom {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label-custom {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 600;
+        color: #32325d;
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .form-label-custom i {
+        color: #5e72e4;
+        font-size: 1rem;
+    }
+    
+    .form-control-custom {
+        border: 2px solid #e9ecef;
+        border-radius: 0.75rem;
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+    
+    .form-control-custom:focus {
+        border-color: #fb6340;
+        box-shadow: 0 0 0 3px rgba(251, 99, 64, 0.15);
+        outline: none;
+    }
+    
+    .form-control-custom::placeholder {
+        color: #adb5bd;
+    }
+    
+    .form-select-custom {
+        border: 2px solid #e9ecef;
+        border-radius: 0.75rem;
+        padding: 0.875rem 1rem;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        width: 100%;
+        background-color: white;
+        cursor: pointer;
+    }
+    
+    .form-select-custom:focus {
+        border-color: #fb6340;
+        box-shadow: 0 0 0 3px rgba(251, 99, 64, 0.15);
+        outline: none;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, #fb6340 0%, #fbb140 100%);
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(251, 99, 64, 0.4);
+    }
+    
+    .btn-cancel {
+        background: linear-gradient(135deg, #8898aa 0%, #6c757d 100%);
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        font-size: 1rem;
+    }
+    
+    .btn-cancel:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(136, 152, 170, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .info-card {
+        background: linear-gradient(135deg, #f8f9fe 0%, #ffffff 100%);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        border: 1px solid #e9ecef;
+    }
+    
+    .info-card h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #32325d;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .info-card h4 i {
+        color: #11cdef;
+    }
+    
+    .current-info {
+        background: rgba(251, 99, 64, 0.1);
+        border-radius: 0.75rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .current-info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px dashed rgba(251, 99, 64, 0.3);
+        font-size: 0.9rem;
+    }
+    
+    .current-info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .current-info-item .label {
+        color: #8898aa;
+    }
+    
+    .current-info-item .value {
+        color: #32325d;
+        font-weight: 600;
+    }
+    
+    .info-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .info-list li {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+        font-size: 0.9rem;
+        color: #525f7f;
+    }
+    
+    .info-list li:last-child {
+        border-bottom: none;
+    }
+    
+    .info-list li i {
+        color: #fb6340;
+        margin-top: 0.2rem;
+    }
+    
+    .required-indicator {
+        color: #f5365c;
+        margin-left: 0.25rem;
+    }
+    
+    .text-danger {
+        color: #f5365c !important;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+    
+    .text-danger::before {
+        content: '\f071';
+        font-family: 'Font Awesome 6 Free';
+        font-weight: 900;
+    }
+    
+    .matricula-id-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+        .form-header {
+            padding: 1.5rem;
+        }
+        
+        .form-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .form-card-body {
+            padding: 1.5rem;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+        
+        .btn-submit, .btn-cancel {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4" style="margin-top: 80px;">
+    <!-- Header Section -->
+    <div class="form-header">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1><i class="fa fa-edit me-2"></i> Editar Matrícula</h1>
+                <p>Modifique los datos de la matrícula seleccionada</p>
+            </div>
+            <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                <span class="matricula-id-badge">
+                    <i class="fa fa-hashtag"></i> ID: {{ matricula.codigoMatricula }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Form Column -->
+        <div class="col-lg-8 mb-4">
+            <div class="form-card">
+                <div class="form-card-header">
+                    <h3><i class="fa fa-pencil-alt"></i> Modificar Datos</h3>
+                </div>
+                <div class="form-card-body">
+                    <form action="{% url 'editar_matricula' matricula_id=matricula.codigoMatricula %}" method="post" id="frm_editar_matricula">
+                        {% csrf_token %}
+                        
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">
+                                <i class="fa fa-user"></i> Nombre del Estudiante
+                                <span class="required-indicator">*</span>
+                            </label>
+                            <input type="text" 
+                                   placeholder="Ingrese el nombre completo del estudiante" 
+                                   name="nombreEstudiante" 
+                                   id="nombreEstudiante" 
+                                   class="form-control-custom" 
+                                   value="{{ matricula.nombreEstudiante }}"
+                                   required>
+                        </div>
+                        
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">
+                                <i class="fa fa-id-card"></i> Documento de Identidad
+                                <span class="required-indicator">*</span>
+                            </label>
+                            <input type="text" 
+                                   placeholder="Ingrese el número de documento" 
+                                   name="documentoEstudiante" 
+                                   id="documentoEstudiante" 
+                                   class="form-control-custom" 
+                                   value="{{ matricula.documentoEstudiante }}"
+                                   required>
+                        </div>
+                        
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">
+                                <i class="fa fa-calendar-alt"></i> Fecha de Matrícula
+                                <span class="required-indicator">*</span>
+                            </label>
+                            <input type="date" 
+                                   name="fechaMatricula" 
+                                   id="fechaMatricula" 
+                                   class="form-control-custom" 
+                                   value="{{ matricula.fechaMatricula|date:'Y-m-d' }}"
+                                   required>
+                        </div>
+                        
+                        <div class="form-group-custom">
+                            <label class="form-label-custom">
+                                <i class="fa fa-book"></i> Curso
+                                <span class="required-indicator">*</span>
+                            </label>
+                            <select name="cursoMatricula" id="cursoMatricula" class="form-select-custom" required>
+                                <option value="">-- Seleccione un curso --</option>
+                                {% for curso in cursos %}
+                                    {% if curso.cupoMaxCurso > 0 %}
+                                        <option value="{{ curso.codigoCurso }}" {% if matricula.cursoMatricula.codigoCurso == curso.codigoCurso %}selected{% endif %}>
+                                            {{ curso.nombreCurso }} ({{ curso.areaCurso }})
+                                        </option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="btn-submit" type="submit">
+                                <i class="fa fa-save"></i> Actualizar Matrícula
+                            </button>
+                            <a class="btn-cancel" href="{% url 'lista_matriculas' %}">
+                                <i class="fa fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Column -->
+        <div class="col-lg-4 mb-4">
+            <div class="info-card">
+                <h4><i class="fa fa-info-circle"></i> Datos Actuales</h4>
+                <div class="current-info">
+                    <div class="current-info-item">
+                        <span class="label">Estudiante:</span>
+                        <span class="value">{{ matricula.nombreEstudiante }}</span>
+                    </div>
+                    <div class="current-info-item">
+                        <span class="label">Documento:</span>
+                        <span class="value">{{ matricula.documentoEstudiante }}</span>
+                    </div>
+                    <div class="current-info-item">
+                        <span class="label">Fecha:</span>
+                        <span class="value">{{ matricula.fechaMatricula|date:"d/m/Y" }}</span>
+                    </div>
+                    <div class="current-info-item">
+                        <span class="label">Curso:</span>
+                        <span class="value">{{ matricula.cursoMatricula.nombreCurso }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-card mt-3">
+                <h4><i class="fa fa-lightbulb"></i> Consejos</h4>
+                <ul class="info-list">
+                    <li>
+                        <i class="fa fa-check-circle"></i>
+                        <span>Verifique los datos antes de guardar los cambios</span>
+                    </li>
+                    <li>
+                        <i class="fa fa-check-circle"></i>
+                        <span>El documento debe ser único para cada estudiante</span>
+                    </li>
+                    <li>
+                        <i class="fa fa-check-circle"></i>
+                        <span>Los cambios se aplicarán inmediatamente</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        // Form validation
+        $("#frm_editar_matricula").validate({
+            rules: {
+                nombreEstudiante: {
+                    required: true,
+                    minlength: 2
+                },
+                documentoEstudiante: {
+                    required: true
+                },
+                fechaMatricula: {
+                    required: true
+                },
+                cursoMatricula: {
+                    required: true
+                }
+            },
+            messages: {
+                nombreEstudiante: {
+                    required: "Por favor ingrese el nombre del estudiante",
+                    minlength: "El nombre debe tener al menos 2 caracteres"
+                },
+                documentoEstudiante: {
+                    required: "Por favor ingrese el documento"
+                },
+                fechaMatricula: {
+                    required: "Por favor ingrese la fecha de matrícula"
+                },
+                cursoMatricula: {
+                    required: "Por favor seleccione un curso"
+                }
+            },
+            errorElement: 'div',
+            errorPlacement: function (error, element) {
+                error.addClass('text-danger');
+                error.insertAfter(element);
+            },
+            submitHandler: function(form) {
+                // Show confirmation
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: '¿Confirmar cambios?',
+                        text: "Se actualizarán los datos de la matrícula",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#fb6340',
+                        cancelButtonColor: '#8898aa',
+                        confirmButtonText: '<i class="fa fa-save"></i> Sí, actualizar',
+                        cancelButtonText: '<i class="fa fa-times"></i> Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            var submitBtn = $(form).find('.btn-submit');
+                            submitBtn.html('<i class="fa fa-spinner fa-spin"></i> Actualizando...');
+                            submitBtn.prop('disabled', true);
+                            form.submit();
+                        }
+                    });
+                } else {
+                    form.submit();
+                }
+            }
+        });
+        
+        // Add focus effects
+        $('.form-control-custom, .form-select-custom').on('focus', function() {
+            $(this).parent().find('.form-label-custom i').css('color', '#fb6340');
+        }).on('blur', function() {
+            $(this).parent().find('.form-label-custom i').css('color', '#5e72e4');
+        });
+    });
+</script>
+
+{% endblock contenido %}
